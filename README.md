@@ -373,3 +373,12 @@ maxProfit([128, 97, 121, 123, 98, 97, 105])
 
 ## 8. Egg drop (optional)
 This is a fun exercise to do - consider this optional after you are done with all the exercises above. Imagine that you wanted to find the highest floor of a 100 story building that you could drop an egg from without the egg breaking. But you only have 2 eggs. Write an algorithm to find out in the most efficient way which floors you should drop the eggs from. After you have understood the question and made some attempts to solve the problem, go through this reading before you start coding: http://datagenetics.com/blog/july22012/index.html.
+
+
+>// We can drop the first egg every 10 floors, and then when it breaks start dropping at -9 floors from where it broken, down to -1 floors
+// In the worst case, this takes 18 steps if the floor is 99
+// In the best case it takes 2 steps, if the floor is 2
+// How can we normalize the number of steps it takes?
+// Answer: Use the formula for triangular numbers, so that lower floors take more second egg drops than higher floors
+// n + (n-1) + (n-2) + (n-3) + (n-4) + ... + 1 >= 100
+// n (n+1) / 2 >= 100
