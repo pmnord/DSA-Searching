@@ -158,7 +158,40 @@ Imagine you are looking for a book in a library with a Dewey Decimal index. How 
 // We can use a binary search for the category with the Dewey Decimal number
 // Then use a linear search to find the book itself
 
+// Books in a library can be expressed as an array of books within an array of Dewey categories going from 0 to 999
 
+// const categories = [['books'...]...]
+
+// Ignoring the fact that we can just access an array by its index number...
+
+function findCategory(categories, dewey, title) {
+  if (dewey < 0 || dewey > 999) {return 'Invalid Dewey Number'}
+  if (typeof title !== 'string') {return 'Title must be a string'}
+
+  const middle = Math.floor(categories / 2) 
+
+  if (middle === dewey) {
+    return findTitle(categories[middle], title);
+  }
+  else if (middle < dewey) {
+    return findCategory(categories.slice(middle), dewey, title)
+  }
+  else if (middle > dewey) {
+    return findCategory(categories.slice(0, middle), dewey, title)
+  }
+}
+
+function findTitle(category, title) {
+  let result;
+
+  category.forEach(book => {
+    if (book === title) {
+      result = book;
+    }
+  })
+
+  return result ? result : 'The book was not found';
+}
 
 ```
 
@@ -287,8 +320,56 @@ security-officer            Selar
 
 This tree is meant to represent who is in charge of lower-ranking officers. For example, Commander Riker is directly responsible for Worf and LaForge. People of the same rank are at the same level in the tree. However, to distinguish between people of the same rank, those with more experience are on the left and those with less on the right (i.e., experience decreases from left to right). Suppose a fierce battle with an enemy ensues. Write a program that will take this tree of commanding officers and outlines the ranking officers in their ranking order so that if officers start dropping like flies, we know who is the next person to take over command.
 
+```js
+// This is essentially just breadth first search. 
+// We can return a queue that represents who is in charge as officers dequeue
+
+whosInChargeNext() {
+    let currentNode = this.root;
+    let list = [];
+    let queue = [];
+    queue.push(currentNode);
+
+    while (queue.length > 0) {
+      currentNode = queue.shift();
+      list.push(currentNode.value);
+      if (currentNode.left) {
+        queue.push(currentNode.left);
+      }
+      if (currentNode.right) {
+        queue.push(currentNode.right)
+      }
+    }
+    return list;
+  }
+```
+
 ## 7. Max profit
 The share price for a company over a week's trading is as follows: [128, 97, 121, 123, 98, 97, 105]. If you had to buy shares in the company on a particular day, and sell the shares on a subsequent day, write an algorithm to work out what the maximum profit you could make would be.
+
+```js
+// There doesn't seem to be a way to avoid a nested for loop here
+
+function maxProfit(array) {
+  // Initialise the max with an actual value from the array
+  // We could initialize at 0, but the max profit might be negative
+  let max = array[1] - array[0]; // Price sold at minus price bought at
+  let days = [array[0], array[1]];
+
+  for (let i = 0; i < array.length; i++) {
+    for (let j = i + 1; j < array.length; j++) {
+      if (array[j] - array[i] > max) {
+        max = array[j] - array[i];
+        days[0] = i;
+        days[1] = j;
+      }
+    }
+  }
+
+  return `Buy on day ${days[0] + 1} and sell on day ${days[1] + 1} to earn ${max} profit`
+}
+maxProfit([128, 97, 121, 123, 98, 97, 105])
+```
 
 ## 8. Egg drop (optional)
 This is a fun exercise to do - consider this optional after you are done with all the exercises above. Imagine that you wanted to find the highest floor of a 100 story building that you could drop an egg from without the egg breaking. But you only have 2 eggs. Write an algorithm to find out in the most efficient way which floors you should drop the eggs from. After you have understood the question and made some attempts to solve the problem, go through this reading before you start coding: http://datagenetics.com/blog/july22012/index.html.
