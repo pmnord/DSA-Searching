@@ -2,8 +2,19 @@
 
 ## 1. How many searches?
 Given a sorted list `3, 5, 6, 8, 11, 12, 14, 15, 17, 18` and using the recursive binary search algorithm, identify the sequence of numbers that each recursive call will search to try and find 8.
+```
+[ 3,  5,  6,  8, 11, 12, 14, 15, 17, 18 ]
+[ 3, 5, 6, 8, 11 ]
+[ 6, 8, 11 ]
+```
 
 Given a sorted list `3, 5, 6, 8, 11, 12, 14, 15, 17, 18` and using the recursive binary search algorithm, identify the sequence of numbers that each recursive call will search to try and find 16.
+```
+[ 3,  5,  6,  8, 11, 12, 14, 15, 17, 18 ]
+[ 12, 14, 15, 17, 18 ]
+[ 15, 17, 18 ]
+[ 15 ]
+```
 
 ## 2. Adding a React UI
 For exercises 1 and 2, you will be using a search algorithm to search for an item in a dataset. You will be testing the efficiency of 2 search algorithms, linear search and binary search. You will also have a UI (a simple textbox will do) through which you will be sending your input that you want to search. There is no server-side to this program. All of this should be done using React.
@@ -18,25 +29,246 @@ Given the following dataset, find out how many tries it took to search for a par
 
 Use the same front end and the dataset from the previous exercise for this exercise. Use array.sort to sort the dataset. Then implement a binary search to find a particular value in the dataset. Display how many tries it took to search for a particular item in the dataset using binary search. If the item is not in the dataset, provide a message and indicate how many searches it took to find that out.
 
+<details><summary>Show Solution</summary>
+
+```js
+import React from 'react';
+import './App.css';
+
+function App() {
+
+  let binaryCounter = 0;
+
+  function binarySearch(array, query) {
+    binaryCounter++;
+    const middle = Math.floor(array.length / 2);
+
+    if (array[middle] === query) {
+      let result = {
+        found: true,
+        count: binaryCounter,
+      };
+      binaryCounter = 0;
+      return result;
+    }
+    else if (array.length === 1) {
+      let result = {
+        found: false,
+        count: binaryCounter,
+      }
+      binaryCounter = 0;
+      return result;
+    }
+    else if (array[middle] > query) {
+      return binarySearch(array.slice(0, middle), query)
+    }
+    else if (array[middle] < query) {
+      return binarySearch(array.slice(middle, array.length), query)
+    }
+  }
+
+  let linearCounter = 0;
+
+  function linearSearch(array, query) {
+    for (let i = 0; i < array.length; i++) {
+      linearCounter++;
+      if (array[i] === query) {
+        let result = {
+          found: true,
+          count: linearCounter,
+        };
+        linearCounter = 0;
+        return result;
+      }
+    }
+    let result = {
+      found: false,
+      count: linearCounter,
+    }
+    linearCounter = 0;
+    return result;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    const dataset = e.target.dataset.value;
+    const query = e.target.query.value;
+    const result = document.getElementById('result');
+
+    if (!dataset || !query) {
+      result.innerText = 'Please provide a Dataset and Search Term';
+      return;
+    }
+
+    const binaryCount = binarySearch(dataset.split(' ').sort(), query);
+    const linearCount = linearSearch(dataset.split(' '), query);
+
+    if (!binaryCount.found) {
+      return result.innerText = `After ${binaryCount.count} binary searches \n and ${linearCount.count} linear searches, \n the search term was not found`;
+    }
+
+    return result.innerText = `It took ${binaryCount.count} steps with binary search \n and ${linearCount.count} steps with linear search`;
+
+  }
+
+  const formStyle = {
+    'display': 'flex',
+    'flexDirection': 'column',
+    'width': '300px',
+    'margin': '0 auto'
+  }
+
+  return (
+    <div className="App">
+      <h1>Linear vs Binary Search</h1>
+      <p>How many steps does each take?</p>
+
+      <form style={formStyle} onSubmit={handleSubmit}>
+
+        <label htmlFor="dataset">Dataset to Search</label>
+        <textarea id="dataset"></textarea>
+
+        <label htmlFor="query">Search Term</label>
+        <input type="text" id="query"></input>
+
+        <br></br>
+
+        <button>Submit</button>
+
+      </form>
+
+      <h2 id="result">
+
+      </h2>
+
+    </div>
+  );
+}
+
+export default App;
+```
+
+</details>
+
 ## 3. Find a book
 Imagine you are looking for a book in a library with a Dewey Decimal index. How would you go about it? Can you express this process as a search algorithm? Implement your algorithm to find a book whose Dewey and book title is provided.
+
+```js
+// We can use a binary search for the category with the Dewey Decimal number
+// Then use a linear search to find the book itself
+
+
+
+```
 
 ## 4. Searching in a BST
 ** No coding is needed for these drills**. Once you have answered it, you can then code the tree and implement the traversal to see if your answer is correct.
 
 1) Given a binary search tree whose in-order and pre-order traversals are respectively `14 15 19 25 27 35 79 89 90 91` and `35 25 15 14 19 27 89 79 91 90`. What would be its postorder traversal?
-> 14 15 19 27 25 89 91 90 79 35 
+> Answer: 14 15 19 27 25 89 91 90 79 35 
 
 2) The post order traversal of a binary search tree is `5 7 6 9 11 10 8`. What is its pre-order traversal?
+> Answer: 8, 6, 5, 7, 10, 9, 11
 
 ## 5. Implement different tree traversals
 Using your BinarySearchTree class from your previous lesson, create a binary search tree with the following dataset: 25 15 50 10 24 35 70 4 12 18 31 44 66 90 22. Then implement inOrder(), preOrder(), and postOrder() functions. Test your functions with the following datasets.
 
-A pre-order traversal should give you the following order: 25, 15, 10, 4, 12, 24, 18, 22, 50, 35, 31, 44, 70, 66, 90
+<details><summary><b>See Solution</b></summary>
 
+```js
+  breadthFirstSearch() {
+    let currentNode = this.root;
+    let list = [];
+    let queue = [];
+    queue.push(currentNode);
+
+    while (queue.length > 0) {
+      currentNode = queue.shift();
+      console.log(currentNode.value)
+      list.push(currentNode.value);
+      if (currentNode.left) {
+        queue.push(currentNode.left);
+      }
+      if (currentNode.right) {
+        queue.push(currentNode.right)
+      }
+    }
+    return list;
+  }
+  breadthFirstSearchR(list = [], queue = []) {
+    if (queue.length === 0) {
+      return list;
+    }
+    let currentNode = queue.shift();
+    list.push(currentNode.value)
+    if (currentNode.left) {
+      queue.push(currentNode.left);
+    }
+    if (currentNode.right) {
+      queue.push(currentNode.right)
+    }
+    return this.breadthFirstSearchR(list, queue)
+  }
+  dfsInOrder() {
+    return traverseInOrder(this.root, [])
+  }
+  dfsPreOrder() {
+    return traversePreOrder(this.root, [])
+  }
+  dfsPostOrder() {
+    return traversePostOrder(this.root, [])
+  }
+}
+
+function traverseInOrder(node, list) {
+  // console.log(node.value)
+  if (node.left) {
+    traverseInOrder(node.left, list);
+  }
+  list.push(node.value)
+  if (node.right) {
+    traverseInOrder(node.right, list)
+  }
+  return list;
+}
+
+function traversePreOrder(node, list) {
+  // console.log(node.value)
+  list.push(node.value)
+  if (node.left) {
+    traversePreOrder(node.left, list);
+  }
+  if (node.right) {
+    traversePreOrder(node.right, list)
+  }
+  return list;
+}
+
+function traversePostOrder(node, list) {
+  // console.log(node.value)
+  if (node.left) {
+    traversePostOrder(node.left, list);
+  }
+  if (node.right) {
+    traversePostOrder(node.right, list)
+  }
+  list.push(node.value)
+  return list;
+}
+```
+
+</details>
+<br>
+A pre-order traversal should give you the following order: 25, 15, 10, 4, 12, 24, 18, 22, 50, 35, 31, 44, 70, 66, 90
+<br>
 In-order: 4, 10, 12, 15, 18, 22, 24, 25, 31, 35, 44, 50, 66, 70, 90
 
 Post-order: 4, 12, 10, 22, 18, 24, 15, 31, 44, 35, 66, 90, 70, 50, 25
+
+> Pre Order 25,15,10,4,12,24,18,22,50,35,31,44,70,66,90
+In Order 4,10,12,15,18,22,24,25,31,35,44,50,66,70,90
+Post Order 4,12,10,22,18,24,15,31,44,35,66,90,70,50,25
 
 ## 6. Find the next commanding officer
 Suppose you have a tree representing a command structure of the Starship USS Enterprise.
